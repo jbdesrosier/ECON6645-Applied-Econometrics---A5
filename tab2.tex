@@ -1,0 +1,67 @@
+{
+\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
+\begin{tabular}{l*{1}{c}}
+\hline\hline
+            &\multicolumn{1}{c}{(1)}\\
+            &\multicolumn{1}{c}{ln\_income}\\
+\hline
+yrs\_schooling&     -0.0730         \\
+            &     (-0.65)         \\
+[1em]
+experience  &      0.0150         \\
+            &      (0.99)         \\
+[1em]
+experience2 &   -0.000371         \\
+            &     (-1.54)         \\
+[1em]
+age         &      0.0504\sym{*}  \\
+            &      (2.17)         \\
+[1em]
+age2        &   -0.000247         \\
+            &     (-1.01)         \\
+[1em]
+1.marital   &           0         \\
+            &         (.)         \\
+[1em]
+2.marital   &    -0.00881         \\
+            &     (-0.40)         \\
+[1em]
+3.marital   &     0.00865         \\
+            &      (0.13)         \\
+[1em]
+4.marital   &      0.0151         \\
+            &      (0.48)         \\
+[1em]
+1.region    &      0.0965         \\
+            &      (0.75)         \\
+[1em]
+2.region    &     -0.0369         \\
+            &     (-0.23)         \\
+[1em]
+3.region    &           0         \\
+            &         (.)         \\
+[1em]
+4.region    &     -0.0377         \\
+            &     (-0.24)         \\
+[1em]
+5.region    &     -0.0585         \\
+            &     (-0.41)         \\
+[1em]
+vm          &           0         \\
+            &         (.)         \\
+[1em]
+female      &           0         \\
+            &         (.)         \\
+[1em]
+imm         &           0         \\
+            &         (.)         \\
+[1em]
+\_cons      &       9.565\sym{***}\\
+            &      (6.22)         \\
+\hline
+\(N\)       &        9996         \\
+\hline\hline
+\multicolumn{2}{l}{\footnotesize \textit{t} statistics in parentheses}\\
+\multicolumn{2}{l}{\footnotesize \sym{*} \(p<0.05\), \sym{**} \(p<0.01\), \sym{***} \(p<0.001\)}\\
+\end{tabular}
+}

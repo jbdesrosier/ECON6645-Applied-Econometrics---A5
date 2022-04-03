@@ -1,0 +1,171 @@
+---
+title: "EC02 (PROCESS # 22-MOT-EA-HRS-24823-1) Written Exam"
+author: Justin Desrosier     --     2022/03/22
+output: 
+  pdf_document:
+    latex_engine: xelatex
+mainfont: Arial
+fontsize: 12pt
+geometry: margin=.95in
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(readr)
+library(tidyverse)
+library(flextable)
+library(magrittr)
+library(data.table)
+library(scales)
+library(zoo)
+```
+
+## Question 1
+
+You have been tasked with supporting the analysis of ship traffic as part of a broader effort to understand shipping trends on Canada's Pacific coast. Your supervisor would like you to create summary tables on distance sailed by vessel types for each year and to perform an analysis that looks at the differences in distance sailed between select years using the dataset `NM_sailed_2015_2020_Pacific.csv`.
+
+#### Task 1
+
+* Create a table to show distance sailed by general vessel type (NTYPE) for each year.
+
+```{r 1, message=F, echo=F}
+library(readr)
+library(tidyverse)
+library(flextable)
+library(magrittr)
+library(data.table)
+library(scales)
+         
+NM_Sailed_2015_2020_Pacific <- read_csv("EN/EC-02_data/EC-02_data/Part 2 - Descriptive analysis/Ship_traffic_summary/NM_Sailed_2015-2020_Pacific.csv")
+#View(NM_Sailed_2015_2020_Pacific)
+
+Distance_Sailed <- NM_Sailed_2015_2020_Pacific %>%
+  group_by(NTYPE, YEAR) %>%
+  summarise(NM_SAILED_sum=sum(NM_SAILED)) %>%
+  mutate(NM_SAILED_sum = round(NM_SAILED_sum/1000, digits=0)) %>%
+  spread(YEAR, NM_SAILED_sum) %>%
+  rename("Vessel Type" = NTYPE)
+
+if(require("scales")){
+ft <- flextable(Distance_Sailed)
+colourer <- col_numeric(
+              palette = c("transparent", "#149c88"),
+              domain = c(250, 2750))
+ft <- bg(ft, 
+         j = c("2015",   "2016",   "2017",   "2018",   "2019",   "2020"),
+         bg = colourer,
+         part = "body")
+ft <- bold(ft, bold = TRUE, part = "header")
+ft <- fontsize(ft, size=10)
+ft <- width(ft, j="Vessel Type", width=2, unit="in")
+ft <- footnote(ft, i = 1, j = 1,
+               value = as_paragraph(
+                c("Distance sailed by general vessel type in nautical miles X 1,000.")
+               ),
+               ref_symbols = c(""),
+               part = "header", inline = TRUE)
+ft <- align(ft,
+            j = c("2015",   "2016",   "2017",   "2018",   "2019",   "2020"),
+            align = "center", part="all")
+ft
+}
+
+```
+
+To create a table that shows the distance sailed by each general vessel type (NTYPE) and by each year, I began by aggregating. Specifically, I calculated the the sum total of the distance annually travelled for each vessel type. Once I calculated the distance for each vessel type and year, I rounded the number to zero additional digits and divided by 1,000 for easier interpretation. The table displays a heat map visual which is specified to range from light to dark between the values 250 and 2,750,000 nautical miles sailed. 
+
+The results indicate that Cargo, Tanker, and Others/Special Ships travelled the least distance on the Pacific coast during the years 2015 to 2020, averaging less than 500 nautical miles annually. Tugs/Port and Pleasure Vessels travelled the greatest annual distance, both surpassing 2,000,000 nautical miles in at least 1 year. 
+
+
+#### Task 2
+
+* Compare the differences in distance sailed between 2019 and 2015 (2019 vs 2015) by general vessel types.
+
+```{r p1, message=F, echo=FALSE}
+Distance_Sailed2 <- NM_Sailed_2015_2020_Pacific %>%
+  group_by(NTYPE, YEAR) %>%
+  summarise(NM_SAILED_sum=sum(NM_SAILED)) %>%
+  mutate(NM_SAILED_sum = round(NM_SAILED_sum/1000, digits=0)) %>%
+  group_by(NTYPE) %>%
+  filter(YEAR==2015 | YEAR==2019) %>%
+  mutate(YEAR = as.character(YEAR)) %>%
+  mutate(Diff = abs(NM_SAILED_sum-lag(NM_SAILED_sum)))
+
+Distance_Sailed2 <- transform(Distance_Sailed2, Diff = na.aggregate(Diff, by = NTYPE))
+
+#Distance_Sailed$Difference_2019_2015 = (Distance_Sailed$"2019"-Distance_Sailed$'2015')
+#Distance_Sailed$Difference_2020_2019 = (Distance_Sailed$"2020"-Distance_Sailed$'2019')
+
+p <- ggplot(Distance_Sailed2, aes(x= reorder(NTYPE, -Diff), y=NM_SAILED_sum, fill=YEAR)) +
+          geom_bar(stat="identity", position=position_dodge()) +
+              theme_minimal() +
+              coord_flip() +
+              scale_fill_manual(values=c('#a4f3e7','#118776')) +
+          geom_point(aes(y=Diff, x=NTYPE, shape="Absolute value of 2019 vs 2015 nautical miles sailed"), size=2.5) +
+          ggtitle("Differences in Total Distance Sailed by General Vessel Types (2019 vs 2015)") +
+          labs(x="General Vessel Type", y="Total Distance Sailed (Nautical Miles X 1000)", shape="Difference") +
+              theme(legend.key.width=unit(1, "cm"),
+                    legend.position = c(0.83, 0.7),
+                    legend.background = element_rect(fill="white"),
+                        plot.title = element_text(hjust = 1.10),
+                        plot.background = element_rect(fill="#d3d3d3")) +
+              guides(fill = guide_legend(reverse = TRUE)) +
+              scale_shape_discrete(labels = function(x) str_wrap(x, width = 20)) +
+              scale_y_continuous(breaks = scales::pretty_breaks(n = 10))
+p
+
+```
+
+To create the charts that compare the differences in distance sailed between 2 years and by general vessel type, I used the same total distance sailed by vessel type and year as I calculated in Task 1. Additionally, for Task 2, I calculated the difference between 2019 and 2015 total distance sailed, and applied an absolute value function. I plotted the difference as a dot overlaying the bar plot that compares the total distance travelled between years. The chart is also reordered ascending by the total difference in distance travelled between 2015 and 2019 for each general vessel type.
+
+The chart shows between 2015 and 2019, Pleasure Vessels had the greatest change in total annual distance travelled, and Tankers had the least change. Pleasure Vessels total annual traffic grew from 2015 to 2019 as can be ascertained from the differentiated colouring between bars for a general vessel type. The top 7 greatest differences were characterized by an increase from 2015 to 2019. Only Tankers and Others/Special Ships declined in total annual distance travelled from 2015 to 2019.
+
+#### Task 3
+
+* Compare the differences in distance sailed between 2020 and 2019 (2020 vs 2019) by general vessel types.
+
+```{r p2, message=F, echo=FALSE}
+Distance_Sailed3 <- NM_Sailed_2015_2020_Pacific %>%
+  group_by(NTYPE, YEAR) %>%
+  summarise(NM_SAILED_sum=sum(NM_SAILED)) %>%
+  mutate(NM_SAILED_sum = round(NM_SAILED_sum/1000, digits=0)) %>%
+  group_by(NTYPE) %>%
+  filter(YEAR==2019 | YEAR==2020) %>%
+  mutate(YEAR = as.character(YEAR)) %>%
+  mutate(Diff = abs(NM_SAILED_sum-lag(NM_SAILED_sum)))
+
+Distance_Sailed3 <- transform(Distance_Sailed3, Diff = na.aggregate(Diff, by = NTYPE))
+
+p <- ggplot(Distance_Sailed3, aes(x= reorder(NTYPE, -Diff), y=NM_SAILED_sum, fill=YEAR)) +
+  geom_bar(stat="identity", position=position_dodge()) +
+  theme_minimal() +
+  coord_flip() +
+  scale_fill_manual(values=c('#a4f3e7','#118776')) +
+  geom_point(aes(y=Diff, x=NTYPE, shape="Absolute value of 2020 vs 2019 nautical miles sailed"), size=2.5) +
+  ggtitle("Differences in Total Distance Sailed by General Vessel Types (2020 vs 2019)") +
+  labs(x="General Vessel Type", y="Total Distance Sailed (Nautical Miles X 1000)", shape="Difference") +
+  theme(legend.key.width=unit(1, "cm"),
+        legend.position = c(0.83, 0.35),
+        legend.background = element_rect(fill="white"),
+                    plot.title = element_text(hjust = 1.10),
+                    plot.background = element_rect(fill="#d3d3d3")) +
+  guides(fill = guide_legend(reverse = TRUE)) +
+  scale_shape_discrete(labels = function(x) str_wrap(x, width = 20)) +
+  scale_y_continuous(breaks = scales::pretty_breaks(n = 10))
+p
+```
+
+The chart for Task 3 has the same methodological approach as the chart from Task 2. Notably, the colouring for the years 2019 and 2020 has changed. In the same way as the last chart, a key feature is that the darker green coloured bars indicate the more recent year of comparison. 
+
+A key analytical difference between these charts; in the chart for Task 2 the Vessel types travelling the greatest total annual distances tend to also have the greatest change between 2015 and 2019, as can be noticed by the downward sloping of the bars. Conversely, the difference between 2020 and 2019 follows no clear pattern in relation to the size of change between years, and average total distance travelled.
+
+Due to the onset of COVID-19 in the year 2020 there may be a shock to specific vessel types following restrictions on their associated activity that can be seen in the Task 3 chart. For instance, Passenger and Pleasure Vessels experienced the greatest change in total distance travelled, and that change was characterized by a decline from 2019 to 2020. Notably, these 2 general vessel types experienced the greatest increase in total distance travelled when comparing 2015 to 2019. Furthermore, from the table in Task 1, we observe a sustained increase from 2015 to 2019 that is followed by a considerable drop in the year 2020 for these vessel types.
+
+#### Written Summary
+
+* Write out your methodological approach to answering part 1 and part 2.
+
+* Provide the results to each of the tasks/questions for part 1 and part 2.
+
+See above.

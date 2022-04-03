@@ -1,0 +1,75 @@
+---
+title: "EC02"
+date: 2022-March-22
+output: 
+  pdf_document:
+    latex_engine: xelatex
+mainfont: Arial
+---
+\fontfamily{cmr}
+\fontsize{12}{22}
+\fontseries{b}
+\selectfont
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Question 1
+
+You have been tasked with supporting the analysis of ship traffic as part of a broader effort to understand shipping trends on Canada's Pacific coast. Your supervisor would like you to create summary tables on distance sailed by vessel types for each year and to perform an analysis that looks at the differences in distance sailed between select years using the dataset `NM_sailed_2015_2020_Pacific.csv`.
+
+#### Task 1
+
+Create a table to show distance sailed by general vessel type (NTYPE) for each year.
+
+```{r 1, message=F, echo=F}
+library(readr)
+library(tidyverse)
+library(flextable)
+library(magrittr)
+library(data.table)
+library(scales)
+         
+NM_Sailed_2015_2020_Pacific <- read_csv("EN/EC-02_data/EC-02_data/Part 2 - Descriptive analysis/Ship_traffic_summary/NM_Sailed_2015-2020_Pacific.csv")
+#View(NM_Sailed_2015_2020_Pacific)
+
+Distance_Sailed <- NM_Sailed_2015_2020_Pacific %>%
+  group_by(NTYPE, YEAR) %>%
+  summarise(NM_SAILED_sum=sum(NM_SAILED)) %>%
+  mutate(NM_SAILED_sum = round(NM_SAILED_sum/1000, digits=0)) %>%
+  spread(YEAR, NM_SAILED_sum) %>%
+  rename("Vessel Type" = NTYPE)
+
+if(require("scales")){
+ft <- flextable(Distance_Sailed)
+colourer <- col_numeric(
+              palette = c("transparent", "#149c88"),
+              domain = c(0, 3000))
+ft <- bg(ft, 
+         j = c("2015",   "2016",   "2017",   "2018",   "2019",   "2020"),
+         bg = colourer,
+         part = "body")
+ft <- bold(ft, bold = TRUE, part = "header")
+ft <- fontsize(ft, size=10)
+ft <- width(ft, j="Vessel Type", width=2, unit="in")
+ft <- footnote(ft, i = 1, j = 1,
+               value = as_paragraph(
+                c("Distance sailed by general vessel type in nautical miles X 1,000.")
+               ),
+               ref_symbols = c(""),
+               part = "header", inline = TRUE)
+ft
+}
+
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.

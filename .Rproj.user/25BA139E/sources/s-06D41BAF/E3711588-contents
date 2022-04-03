@@ -1,0 +1,189 @@
+---
+title: "ECON6645 - Applied Econometrics - Assignment 5"
+author: "Justin Desrosier"
+date: "31/03/2022"
+output: pdf_document    
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning=FALSE)
+```
+
+## Question 1
+
+The regression coefficients in table 1 model (1) are the resulting output from a pooled OLS regression. Individual cross-sections that are the 1993 and 1994 waves of The Survey of Labour and Income Dynamics are pooled to fit an OLS regression line on the entire data set disregarding effects across years or individual respondents. The drawback of pooled OLS in this case is an inability to account for innate effects that may boost a respondents ability to increase their income. I will further detail why this may not be a problem in the next section.
+
+Table 1 model (1) would indicate that the return on 1 year of schooling is associated with a 6.6\% increase in income on average. An additional year of experience is associated with a 3.8\% increase in income on average, and from the quadratic $Experience^2$ term we can ascertain that there are diminishing returns to years of experience. A 1 year increase in an individuals age is also associated with higher income, an estimated 3.8\%, similarly the slope is concave indicating diminishing returns to age. 
+
+The SLID survey results indicate that being a visible minority, female, or an immigrant are all associated with lower than average incomes, although by different magnitudes. It is estimated that females had 41.6\% less income than the average respondent. Being a visible minority was associated with approximately 5\% less income than the average respondent. Being an immigrant to Canada had a statistically insignificant effect on income, although the result indicates that it is associated with a close magnitude in average decrease in income as being a visible minority. 
+
+## Question 2
+
+Table 1 model (2) display the coefficients of the same regression with wave (1993, 1994) fixed effects and individual (respondent) fixed effects. The Fixed technique may be able to control for unobserved heterogeneity across individuals. Where pooled OLS does not treat individuals any different from each other, fixed effects accounts for changes in an individuals characteristics across time. In our case, fixed effects assumes that differences in individuals income is due to inherent characteristics that do not change across time.   
+
+The FE model (2) has less observations than the pooled OLS due to filtering for attrition in the survey data. In particular, approximately 3000 respondents did not participate in both the 1993 and 1994 waves. 
+
+In comparison with the pooled OLS approach, fixed effects are not a sensical solution for this subset of the SLID data set for a few reasons. Firstly, since FE does away with characteristics that are unchanging over time, we lose 3 key variables that have a statistically significant impact on $Income$, that are race, sex, and being an immigrant. In order to decipher the effect of inherent ability on income, it would be important to control for these factors because they have no effect on ability. Since these variable cannot be included in our FE regression there is a greater burden on the idiosyncratic error term, it is further inflated making it more of a challenge to disentangle ability.  
+
+Another fallback of the FE model in this case, stems from a technicality of the negative coefficient associated with years of schooling. Since there are only two waves of survey responses in this data set, we are unable to observe the long-run returns from education. When specifying individual (respondent) specific effects across the two waves there was a limited number of schooling scenarios to observe. Individuals either did not increase years of schooling and had an average year-over-year increase in income of ~\$1065 or they acquired more schooling and forewent a formal income, losing an average ~\$536 for that year (Table 2). Therefore the return on 1 year of schooling appears to have a negative effect on income, which as can be observed in Figure 1, is not the case.
+
+On the other hand, $Age$ may have an improved estimate using a FE specification. When controlling for individual specific effects, such as inherent ability, it is estimated that another year alive is associated with 5% greater income on average. This result is twofold the effect estimated using the pooled OLS approach. It is also sensical that this may appear in our results, since age could be positively correlated with inherent ability to earn more income therefore the effect of age was reduced in the pooled OLS model where there was unobserved heterogeneity. 
+
+
+\newcommand\T{\rule{0pt}{2.6ex}}      
+
+\begin{table}[!htbp] \centering 
+  \caption{Pooled OLS and Fixed Effects} 
+  \label{} 
+\begin{tabular}{@{\extracolsep{5pt}}lcc} 
+\\[-1.8ex]\hline 
+\hline \\[-1.8ex]
+ & \multicolumn{2}{c}{\textit{Dependent variable:}} \\ 
+\cline{2-3} 
+\\[-1.8ex] & \multicolumn{2}{c}{$log(Income)$} \\ 
+\\[-1.8ex] & (1) & (2)\\ 
+\hline \\[-1.8ex] 
+ $Years\;of\;Schooling$  & 0.066$^{***}$ & $-$0.073 \\ 
+  & (0.001) & (0.112) \\ 
+\T $Experience$ & 0.038$^{***}$ & 0.015 \\ 
+  & (0.002) & (0.015) \\ 
+\T $Experience^2$ & $-$0.001$^{***}$ & $-$0.0004 \\ 
+  & (0.00004) & (0.0002) \\ 
+\T $Age$ & 0.021$^{***}$ & 0.050$^{**}$ \\ 
+  & (0.005) & (0.023) \\ 
+\T $Age^2$ & $-$0.0003$^{***}$ & $-$0.0002 \\ 
+  & (0.0001) & (0.0002) \\ 
+\T $Visible\;Minority$ & $-$0.050$^{*}$ & - \\ 
+  & (0.025) &  \\ 
+\T $Female$ & $-$0.416$^{***}$ & - \\ 
+  & (0.009) &  \\ 
+\T $Immigrant$ & $-$0.009 & - \\ 
+  & (0.016) &  \\ 
+\T \textbf{Marital Status}\\
+\T\hspace{\parindent} \hspace{\parindent}\hspace{\parindent} \hspace{\parindent} $Divorced$ & 0.014 & $-$0.009 \\ 
+  & (0.015) & (0.022) \\ 
+\T\hspace{\parindent} \hspace{\parindent}\hspace{\parindent} \hspace{\parindent} $Widowed$ & 0.029 & 0.009 \\ 
+  & (0.039) & (0.068) \\ 
+\T\hspace{\parindent} \hspace{\parindent}\hspace{\parindent} \hspace{\parindent} $Single$ & $-$0.050$^{***}$ & 0.015 \\ 
+  & (0.014) & (0.032) \\ 
+\T \textbf{Region}\\
+\T\hspace{\parindent} \hspace{\parindent}\hspace{\parindent} \hspace{\parindent} $Atlantic$ & $-$0.187$^{***}$ & 0.096 \\ 
+  & (0.012) & (0.129) \\ 
+\T\hspace{\parindent} \hspace{\parindent}\hspace{\parindent} \hspace{\parindent} $Quebec$ & $-$0.112$^{***}$ & $-$0.037 \\ 
+  & (0.012) & (0.162) \\ 
+\T\hspace{\parindent} \hspace{\parindent}\hspace{\parindent} \hspace{\parindent} $Prairies$ & $-$0.096$^{***}$ & $-$0.038 \\ 
+  & (0.011) & (0.155) \\ 
+\T\hspace{\parindent} \hspace{\parindent}\hspace{\parindent} \hspace{\parindent} $British\;Columbia$ & 0.023 & $-$0.058 \\ 
+  & (0.016) & (0.142) \\ 
+\hline \\[-1.8ex] 
+Observations & 12,163 & 9,996 \\ 
+R$^{2}$ & 0.397 & 0.025 \\ 
+\hline 
+\hline \\[-1.8ex] 
+\multicolumn{3}{l} {\parbox[t]{10cm}{ \textit{Notes:} (1) Pooled OLS Regression (2) Fixed Effects (within) Regression, Index: Respondent ID, Wave (1993, 1994) of the Survey of Labour and Income Dynamics. \par
+$Marital\; Status$ has a reference category of Married, and $Region$ has a reference categroy of Ontario.\par 
+Standard errors in parenthesis $^{*}$p$<$0.1; $^{**}$p$<$0.05; $^{***}$p$<$0.01}} \\
+\end{tabular}
+\end{table} 
+
+
+\newpage
+## Appendix
+```{r p1, message=F, echo=FALSE, fig.cap="\\label{fig:figs}Returns on Schooling"}
+library(stargazer)
+library(MASS)
+library(tidyverse)
+library(haven)
+library(dplyr)
+library(plm)
+#install.packages("Hmisc")
+library(Hmisc)
+#install.packages("hexbin")
+library(hexbin)
+
+setwd("D:/Documents/MA Economics/Courses - Winter 2022/ECON6645 - Applied Econometrics/Assignment 5")
+rm(list=ls())
+SLID2 <- read_dta('SLID2.dta')
+
+  SLID2$income <- as.integer(SLID2$income)
+  SLID2$id <- as.character(SLID2$id)
+
+ggplot((SLID2 %>%
+         filter(income<200000)), aes(x=yrs_schooling,
+                  y=income)) +
+  geom_hex(bins=30,
+           aes(fill = stat(cut(count, breaks = c(1,25,75,200,Inf), labels=F,right=T,include.lowest=T)))) +
+  scale_fill_continuous(name = 'Respondents', labels = c('1','25','75','200+')) +
+  geom_smooth(method='loess', se=F, colour='red') +
+  xlab("Years of Schooling") +
+  ylab("Income") +
+  ggtitle("Returns on Schooling") +
+  theme(legend.position = c(0.11, 0.77),
+        legend.background = element_rect(fill="white"))
+```
+
+```{r p2, message=F, echo=FALSE, fig.cap="\\label{fig:p}Returns on Age"}
+library(stargazer)
+library(MASS)
+library(tidyverse)
+library(haven)
+library(dplyr)
+library(plm)
+#install.packages("Hmisc")
+library(Hmisc)
+#install.packages("hexbin")
+library(hexbin)
+
+setwd("D:/Documents/MA Economics/Courses - Winter 2022/ECON6645 - Applied Econometrics/Assignment 5")
+rm(list=ls())
+SLID2 <- read_dta('SLID2.dta')
+
+  SLID2$income <- as.integer(SLID2$income)
+  SLID2$id <- as.character(SLID2$id)
+
+ggplot((SLID2 %>%
+          filter(income<200000)), aes(x=age,
+                                      y=income)) +
+  geom_hex(bins=30,
+           aes(fill = stat(cut(count, breaks = c(1,25,75,200,Inf), labels=F,right=T,include.lowest=T)))) +
+  scale_fill_continuous(name = 'Respondents', labels = c('1','25','75','200', '250+')) +
+  geom_smooth(method='loess', se=F, colour='red') +
+  xlab("Age") +
+  ylab("Income") +
+  ggtitle("Return on Age") +
+  theme(legend.position = c(0.11, 0.77),
+        legend.background = element_rect(fill="white"))
+```
+
+\begin{center}
+\begin{tabular}{||c c||} 
+ \hline
+ \textbf{First Differences} & \\ [0.5ex] 
+ \hline\hline
+ Average Difference in Education: & 0.0019 Years  \\ 
+ \hline
+ Average Difference in Income: & \$1054.55  \\[1ex] 
+ \hline
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{tabular}{||c c||} 
+ \hline
+ \textbf{Year-over-Year Return on Schooling} & \\ [0.5ex] 
+ \hline\hline
+ Average change in income if respondent did not acquire more schooling: & \$1064.98  \\ 
+ \hline
+ Average change in income if respondent acquired at least 1 more day of schooling: & -\$535.71  \\[1ex] 
+ \hline
+\end{tabular}
+\end{center}
+
+
+
+
+
+
+
+
+

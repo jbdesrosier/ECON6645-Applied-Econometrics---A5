@@ -1,0 +1,59 @@
+library(readr)
+library(tidyverse)
+library(flextable)
+library(magrittr)
+library(data.table)
+library(scales)
+
+NM_Sailed_2015_2020_Pacific <- read_csv("EN/EC-02_data/EC-02_data/Part 2 - Descriptive analysis/Ship_traffic_summary/NM_Sailed_2015-2020_Pacific.csv")
+#View(NM_Sailed_2015_2020_Pacific)
+
+#TASK1
+
+Distance_Sailed <- NM_Sailed_2015_2020_Pacific %>%
+  group_by(NTYPE, YEAR) %>%
+  summarise(NM_SAILED_sum=sum(NM_SAILED)) %>%
+  mutate(NM_SAILED_sum = round(NM_SAILED_sum/1000, digits=0)) %>%
+  spread(YEAR, NM_SAILED_sum)
+
+if(require("scales")){
+ft <- flextable(Distance_Sailed)
+colourer <- col_numeric(
+              palette = c("transparent", "red"),
+              domain = c(0, 3000000))
+ft <- bg(ft,
+         j = c("2015",   "2016",   "2017",   "2018",   "2019",   "2020"),
+         bg = colourer,
+         part = "body")
+ft
+}
+
+#TASK2
+
+Distance_Sailed2 <- NM_Sailed_2015_2020_Pacific %>%
+  group_by(NTYPE, YEAR) %>%
+  summarise(NM_SAILED_sum=sum(NM_SAILED)) %>%
+  mutate(NM_SAILED_sum = round(NM_SAILED_sum/1000, digits=0)) %>%
+  group_by(NTYPE) %>%
+  filter(YEAR==2015 | YEAR==2019) %>%
+  mutate(YEAR = as.character(YEAR))
+
+#Distance_Sailed$Difference_2019_2015 = (Distance_Sailed$"2019"-Distance_Sailed$'2015')
+#Distance_Sailed$Difference_2020_2019 = (Distance_Sailed$"2020"-Distance_Sailed$'2019')
+
+p <- ggplot(Distance_Sailed2, aes(x= reorder(NTYPE, -NM_SAILED_sum), y=NM_SAILED_sum, fill=YEAR)) +
+          geom_bar(stat="identity", position=position_dodge()) +
+          theme_minimal() +
+          coord_flip() +
+          scale_fill_manual(values=c('#a4f3e7','#118776'))
+p
+
+
+
+
+
+
+
+
+
+
